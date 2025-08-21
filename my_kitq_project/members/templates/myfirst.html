@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Minha Aplicação Django{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Estilo básico -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        header, footer {
+            background-color: #003366;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav {
+            background-color: #005599;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        main {
+            padding: 2rem;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Projeto Django – Engenharia do Insper</h1>
+    <p>Desenvolvido com Django por {{ user.username|default:"Visitante" }}</p>
+</header>
+
+<nav>
+    <a href="#">Início</a>
+    <a href="#">Sobre</a>
+    <a href="#">Membros</a>
+    {% if user.is_authenticated %}
+        <a href="#">Sair</a>
+    {% else %}
+        <a href="#">Login</a>
+    {% endif %}
+</nav>
+
+<main>
+    <div class="container">
+        {% block content %}
+        <h2>Bem-vindo à sua aplicação Django!</h2>
+        <p>Esta é uma estrutura inicial para construir funcionalidades.</p>
+        {% endblock %}
+    </div>
+</main>
+
+<footer>
+    <p>© {{ year }} Insper - Engenharia da Computação</p>
+</footer>
+
+</body>
+</html>
