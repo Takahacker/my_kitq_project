@@ -1,7 +1,14 @@
 ---
-- hosts: server3
+- hosts: localhost
+  connection: local
+  tasks:
+    - add_host:
+        name: "{{ server }}"
+        groups: working_group
+      changed_when: false
+
+- hosts: working_group
   remote_user: ubuntu
-  become: true
 
   vars:
     repo_url: "https://github.com/Takahacker/my_kitq_project.git"
@@ -12,9 +19,11 @@
 
   tasks:
     - name: Atualizar apt e instalar dependências do sistema
-      apt:
+      become: true
+      become_user: root
+      apt: 
         update_cache: yes
-        name:
+        name: 
           - python3-dev
           - libpq-dev
           - python3-pip
@@ -31,12 +40,12 @@
       git:
         repo: "{{ repo_url }}"
         dest: "{{ dest_dir }}"
-        version: main # ou outra branch se necessário
+        version: main
 
     - name: Ajustar configuração de banco em settings.py
       replace:
         path: "{{ settings_path }}"
-        regexp: "['\\\"]HOST['\\\"]:\\s*['\\\"][^'\\\"]+['\\\"]"
+        regexp: "[\"']HOST[\"']:\\s*[\"'][^\"']+[\"']"
         replace: "'HOST': '{{ db_host }}'"
       when: settings_path is defined
 
@@ -52,5 +61,7 @@
         job: "cd {{ dest_dir }} && ./run.sh"
 
     - name: Reiniciar máquina (opcional)
+      become: true
+      become_user: root
       reboot:
         reboot_timeout: 300
