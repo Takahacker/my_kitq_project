@@ -1,0 +1,56 @@
+---
+- hosts: server3
+  remote_user: ubuntu
+  become: true
+
+  vars:
+    repo_url: "https://github.com/Takahacker/my_kitq_project.git"
+    dest_dir: "/home/ubuntu/my_kitq_project"
+    settings_path: "{{ dest_dir }}/my_kitq_project/settings.py"
+    db_host: "172.16.11.2"    # Altere para o IP real do seu banco de dados
+    db_port: "5432"
+
+  tasks:
+  - name: Atualizar apt e instalar dependências do sistema
+    apt:
+      update_cache: yes
+      name:
+        - python3-dev
+        - libpq-dev
+        - python3-pip
+      state: present
+
+  - name: Instalar pacotes Python necessários
+    pip:
+      name:
+        - django
+        - psycopg2
+      executable: pip3
+
+  - name: Clonar repositório my_kitq_project
+    git:
+      repo: "{{ repo_url }}"
+      dest: "{{ dest_dir }}"
+      version: main  # ou outra branch se necessário
+
+  - name: Ajustar configuração de banco em settings.py
+    replace:
+      path: "{{ settings_path }}"
+      regexp: "['\"]HOST['\"]:\s*['\"][^'\"]+['\"]"
+      replace: "'HOST': '{{ db_host }}'"
+    when: settings_path is defined
+
+  - name: Executar migrações Django
+    command: python3 manage.py migrate
+    args:
+      chdir: "{{ dest_dir }}"
+
+  - name: Criar cron job para iniciar aplicação no boot
+    cron:
+      name: "start django"
+      special_time: reboot
+      job: "cd {{ dest_dir }} && ./run.sh"
+
+  - name: Reiniciar máquina (opcional)
+    reboot:
+      reboot_timeout: 300
