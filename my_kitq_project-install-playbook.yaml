@@ -13,11 +13,13 @@
     repo_url: "https://github.com/Takahacker/my_kitq_project.git"
     dest_dir: "/home/ubuntu/my_kitq_project"
     settings_path: "{{ dest_dir }}/my_kitq_project/settings.py"
+
+    # Variáveis que podem ser sobrescritas na linha de comando
     db_host: "{{ db_host | default('172.16.11.2') }}"
     db_port: "{{ db_port | default('5432') }}"
     db_name: "{{ db_name | default('mydb') }}"
-    db_user: "{{ db_user | default('myuser') }}"
-    db_password: "{{ db_password | default('mypassword') }}"
+    db_user: "{{ db_user | default('cloud') }}"
+    db_password: "{{ db_password | default('cloud') }}"
 
   tasks:
     - name: Atualizar apt e instalar dependências do sistema
