@@ -1,4 +1,3 @@
----
 - hosts: localhost
   connection: local
   tasks:
@@ -14,8 +13,11 @@
     repo_url: "https://github.com/Takahacker/my_kitq_project.git"
     dest_dir: "/home/ubuntu/my_kitq_project"
     settings_path: "{{ dest_dir }}/my_kitq_project/settings.py"
-    db_host: "172.16.11.2" # Altere para o IP real do seu banco de dados
-    db_port: "5432"
+    db_host: "{{ db_host | default('172.16.11.2') }}"
+    db_port: "{{ db_port | default('5432') }}"
+    db_name: "{{ db_name | default('mydb') }}"
+    db_user: "{{ db_user | default('myuser') }}"
+    db_password: "{{ db_password | default('mypassword') }}"
 
   tasks:
     - name: Atualizar apt e instalar dependências do sistema
@@ -42,12 +44,35 @@
         dest: "{{ dest_dir }}"
         version: main
 
-    - name: Ajustar configuração de banco em settings.py
+    - name: Ajustar configuração de banco em settings.py (HOST)
       replace:
         path: "{{ settings_path }}"
         regexp: "[\"']HOST[\"']:\\s*[\"'][^\"']+[\"']"
         replace: "'HOST': '{{ db_host }}'"
-      when: settings_path is defined
+
+    - name: Ajustar configuração de banco em settings.py (PORT)
+      replace:
+        path: "{{ settings_path }}"
+        regexp: "[\"']PORT[\"']:\\s*[\"'][^\"']+[\"']"
+        replace: "'PORT': '{{ db_port }}'"
+
+    - name: Ajustar configuração de banco em settings.py (NAME)
+      replace:
+        path: "{{ settings_path }}"
+        regexp: "[\"']NAME[\"']:\\s*[\"'][^\"']+[\"']"
+        replace: "'NAME': '{{ db_name }}'"
+
+    - name: Ajustar configuração de banco em settings.py (USER)
+      replace:
+        path: "{{ settings_path }}"
+        regexp: "[\"']USER[\"']:\\s*[\"'][^\"']+[\"']"
+        replace: "'USER': '{{ db_user }}'"
+
+    - name: Ajustar configuração de banco em settings.py (PASSWORD)
+      replace:
+        path: "{{ settings_path }}"
+        regexp: "[\"']PASSWORD[\"']:\\s*[\"'][^\"']+[\"']"
+        replace: "'PASSWORD': '{{ db_password }}'"
 
     - name: Executar migrações Django
       command: python3 manage.py migrate
