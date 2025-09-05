@@ -17,9 +17,9 @@
     # Variáveis que podem ser sobrescritas na linha de comando
     db_host: "{{ db_host | default('172.16.11.2') }}"
     db_port: "{{ db_port | default('5432') }}"
-    db_name: "{{ db_name | default('mydb') }}"
+    db_name: "{{ db_name | default('tasks') }}"
     db_user: "{{ db_user | default('cloud') }}"
-    db_password: "{{ db_password | default('cloud') }}"
+    db_password: "{{ db_password }}"
 
   tasks:
     - name: Atualizar apt e instalar dependências do sistema
